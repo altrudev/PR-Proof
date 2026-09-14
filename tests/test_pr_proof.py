@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 import pr_proof
 
@@ -42,6 +43,18 @@ class ScoreTests(unittest.TestCase):
         impact, verdict = pr_proof.posture(findings, 50, 70)
         self.assertEqual(impact, "HIGH")
         self.assertEqual(verdict, "BLOCK")
+
+
+    def test_contradiction_path_executes(self):
+        with mock.patch.object(pr_proof, "files_changed", return_value=["docs/README.md"]), \
+             mock.patch.object(
+                 pr_proof,
+                 "diff_lines",
+                 return_value=(["retry count is 5"], ["retry count is 3"]),
+             ):
+            findings, flags = pr_proof.analyze_diff("base", "head")
+        self.assertTrue(flags["contradiction"])
+        self.assertTrue(any(f.category == "contradictions" for f in findings))
 
 
 if __name__ == "__main__":
