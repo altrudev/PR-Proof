@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddc-pr-proof"
+version = "0.1.0"
+description = "Local-first semantic proof-of-change for pull requests"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Valentyn Rukhaylo / Altru.dev" }]
+license = { text = "All rights reserved" }
+keywords = ["github", "pull-request", "assurance", "semantic-diff", "ddc"]
+
+[project.scripts]
+ddc-pr-proof = "pr_proof:main"
+
+[tool.setuptools]
+py-modules = ["pr_proof"]
