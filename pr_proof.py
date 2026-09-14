@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# DDC PR Proof
+# Copyright © 2026 Valentyn Rukhaylo. All rights reserved.
+# Created by Valentyn Rukhaylo / Altru.dev
+# https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/
+# See LICENSE and NOTICE for terms and attribution.
 from __future__ import annotations
 
 import argparse
