@@ -105,12 +105,12 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
     files = files_changed(base, head)
     added, removed = diff_lines(base, head)
     findings: list[Finding] = []
-    flags = {k: False for k in ("behavior","dependency","config","authority","failure","tests","input","assumption")}
+    flags = {k: False for k in ("behavior","dependency","config","authority","failure","tests","input","assumption","contradiction")}
 
     source = [f for f in files if SRC.search(f) and not TEST.search(f)]
     tests = [f for f in files if TEST.search(f)]
     deps = [f for f in files if Path(f).name in DEP_FILES]
-    configs = [f for f in files if CONFIG.search(f)]
+    configs = [f for f in files if CONFIG.search(f)]\n    docs = [f for f in files if DOC.search(f) or f.lower().endswith(".md")]
 
     if source:
         flags["behavior"] = True
@@ -163,7 +163,7 @@ def scores(title: str, body: str, flags: dict[str, bool]) -> tuple[int, int]:
         "failure": ("retry","rollback","error","failure","timeout","recover"),
         "tests": ("test","spec","coverage"),
         "input": ("input","validation","request","payload","schema"),
-        "assumption": ("assumption","cache","idempot","availability")
+        "assumption": ("assumption","cache","idempot","availability"),\n        "contradiction": ("docs","readme","contract","guarantee","document")
     }
     material = [k for k in terms if flags.get(k)]
     mentioned = {k for k, words in terms.items() if any(w in text for w in words)}
@@ -171,7 +171,7 @@ def scores(title: str, body: str, flags: dict[str, bool]) -> tuple[int, int]:
     narrow = bool(re.search(r"\b(refactor only|cleanup only|docs? only|no behavior change|non-functional|formatting only)\b", text))
     if narrow and any(flags.get(k) for k in ("behavior","authority","failure","input","dependency","config")):
         alignment = min(alignment, 25)
-    weights = {"behavior":12,"dependency":15,"config":12,"authority":24,"failure":20,"input":16,"assumption":12}
+    weights = {"behavior":12,"dependency":15,"config":12,"authority":24,"failure":20,"input":16,"assumption":12,"contradiction":14}
     materiality = sum(v for k,v in weights.items() if flags.get(k))
     surprise = min(100, round(materiality * 0.6 + (100 - alignment) * 0.65 + (20 if narrow else 0)))
     return surprise, alignment
