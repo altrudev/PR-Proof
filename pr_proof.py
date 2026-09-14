@@ -183,7 +183,8 @@ def scores(title: str, body: str, flags: dict[str, bool]) -> tuple[int, int]:
         "failure": ("retry","rollback","error","failure","timeout","recover"),
         "tests": ("test","spec","coverage"),
         "input": ("input","validation","request","payload","schema"),
-        "assumption": ("assumption","cache","idempot","availability"),\n        "contradiction": ("docs","readme","contract","guarantee","document")
+        "assumption": ("assumption","cache","idempot","availability"),
+        "contradiction": ("docs","readme","contract","guarantee","document")
     }
     material = [k for k in terms if flags.get(k)]
     mentioned = {k for k, words in terms.items() if any(w in text for w in words)}
