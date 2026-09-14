@@ -110,7 +110,8 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
     source = [f for f in files if SRC.search(f) and not TEST.search(f)]
     tests = [f for f in files if TEST.search(f)]
     deps = [f for f in files if Path(f).name in DEP_FILES]
-    configs = [f for f in files if CONFIG.search(f)]\n    docs = [f for f in files if DOC.search(f) or f.lower().endswith(".md")]
+    configs = [f for f in files if CONFIG.search(f)]
+    docs = [f for f in files if DOC.search(f) or f.lower().endswith(".md")]
 
     if source:
         flags["behavior"] = True
@@ -144,6 +145,25 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
     if assumptions:
         flags["assumption"] = True
         findings.append(Finding("assumptions", "review", "New or modified operational assumptions detected", assumptions))
+
+    old_facts, new_facts = {}, {}
+    for line in removed:
+        for key, val in FACT.findall(line):
+            old_facts[re.sub(r"\\s+", " ", key.strip().lower())] = val
+    for line in added:
+        for key, val in FACT.findall(line):
+            new_facts[re.sub(r"\\s+", " ", key.strip().lower())] = val
+    contradictions = []
+    for key in sorted(old_facts.keys() & new_facts.keys()):
+        if old_facts[key] != new_facts[key]:
+            contradictions.append(key + ": " + old_facts[key] + " -> " + new_facts[key])
+    if contradictions and docs:
+        flags["contradiction"] = True
+        findings.append(Finding(
+            "contradictions", "review",
+            "Documentation or declared guarantees changed inconsistently",
+            contradictions[:6]
+        ))
 
     if tests:
         flags["tests"] = True
@@ -208,6 +228,7 @@ def render(p: Proof) -> str:
         ("authority","Authority changes"),
         ("failure_modes","Failure-mode changes"),
         ("assumptions","New assumptions"),
+        ("contradictions","Contradictions"),
         ("dependencies","Dependency changes"),
         ("configuration","Configuration changes"),
         ("tests","Test coverage")
