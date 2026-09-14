@@ -1,0 +1,47 @@
+name: "DDC PR Proof"
+description: "Semantic proof-of-change for pull requests."
+author: "Altru.dev"
+branding:
+  icon: "shield"
+  color: "purple"
+inputs:
+  github-token:
+    description: "Token used only to update the PR proof comment."
+    required: false
+    default: ""
+  post-comment:
+    description: "Post or update the PR proof comment."
+    required: false
+    default: "true"
+  fail-on:
+    description: "Gate threshold: never or block."
+    required: false
+    default: "never"
+  base:
+    description: "Optional base ref override."
+    required: false
+    default: ""
+outputs:
+  verdict:
+    description: "PASS, REVIEW, or BLOCK"
+    value: ${{ steps.proof.outputs.verdict }}
+  surprise-score:
+    description: "0-100 semantic surprise score"
+    value: ${{ steps.proof.outputs.surprise_score }}
+  intent-alignment:
+    description: "0-100 intent alignment percentage"
+    value: ${{ steps.proof.outputs.intent_alignment }}
+  proof-file:
+    description: "Path to machine-readable proof JSON"
+    value: ${{ steps.proof.outputs.proof_file }}
+runs:
+  using: "composite"
+  steps:
+    - id: proof
+      shell: bash
+      env:
+        DDC_GITHUB_TOKEN: ${{ inputs.github-token }}
+        DDC_POST_COMMENT: ${{ inputs.post-comment }}
+        DDC_FAIL_ON: ${{ inputs.fail-on }}
+        DDC_BASE: ${{ inputs.base }}
+      run: python3 "$GITHUB_ACTION_PATH/pr_proof.py" analyze
