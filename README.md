@@ -1,5 +1,7 @@
 # DDC PR Proof
 
+**Created by [Valentyn Rukhaylo](https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/) / [Altru.dev](https://altru.dev)**
+
 **Know what your pull request really changes.**
 
 PRs tell you what changed. **DDC PR Proof tells you what changed that matters.**
@@ -137,8 +139,25 @@ Near-term work is deliberately narrow:
 - optional signed attestations
 - stable v1 action tag after external validation
 
+## Author, ownership, and attribution
+
+**DDC PR Proof** was created and is maintained by **Valentyn Rukhaylo**, operating under **Altru.dev**.
+
+- Author / creator: [Valentyn Rukhaylo](https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/)
+- Project / publisher: [Altru.dev](https://altru.dev)
+- GitHub: [altrudev](https://github.com/altrudev)
+- Repository: [altrudev/PR-Proof](https://github.com/altrudev/PR-Proof)
+
+DDC PR Proof and its associated DDC concepts, naming, implementation, scoring model, proof format, and documentation remain the intellectual property of Valentyn Rukhaylo unless explicitly stated otherwise in writing.
+
+If you reference, evaluate, demonstrate, or discuss this work publicly, please attribute it as:
+
+> **DDC PR Proof — created by Valentyn Rukhaylo / Altru.dev**
+
+See [NOTICE](NOTICE), [AUTHORS.md](AUTHORS.md), [CITATION.cff](CITATION.cff), and [LICENSE](LICENSE) for formal attribution and usage terms.
+
 ## Status
 
 v0.1 is an early deterministic proof engine. The repository dogfoods PR Proof on its own pull requests.
 
-Copyright © 2026 Valentyn Rukhaylo / Altru.dev. All rights reserved.
+Copyright © 2026 Valentyn Rukhaylo. Altru.dev. All rights reserved.
