@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use, evaluate, discuss, or reference DDC PR Proof, please cite it using this metadata."
+title: "DDC PR Proof"
+type: software
+authors:
+  - family-names: "Rukhaylo"
+    given-names: "Valentyn"
+    website: "https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/"
+repository-code: "https://github.com/altrudev/PR-Proof"
+url: "https://altru.dev"
+version: "0.1.0"
+date-released: "2026-09-14"
+license: "LicenseRef-Proprietary"
+abstract: "A local-first semantic proof-of-change layer for pull requests that analyzes behavior, risk, authority, assumptions, contradictions, and test evidence."
+keywords:
+  - "DDC"
+  - "pull request"
+  - "software assurance"
+  - "semantic diff"
+  - "GitHub"
