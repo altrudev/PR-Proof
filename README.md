@@ -37,6 +37,32 @@ Example result:
 
 Every run also writes a machine-readable proof to .ddc/pr-proof.json with a proof hash.
 
+## Live demo
+
+See the canonical semantic-surprise demonstration in [PR #2 — Clean up retry handling](https://github.com/altrudev/PR-Proof/pull/2).
+
+The PR claims:
+
+> Refactor only. No behavior change intended.
+
+DDC PR Proof observes a materially different consequence set:
+
+- retry count changed
+- timeout changed
+- rollback behavior removed
+- new idempotency and cache-availability assumptions
+- configuration changed
+- declared guarantees diverged
+- implementation changed without corresponding test changes
+
+Result:
+
+- **DDC Surprise Score: 100/100**
+- **Intent Alignment: 25%**
+- **Merge posture: BLOCK**
+
+The demo is intentionally controlled and exists to make the proof semantics directly inspectable on a real GitHub pull request.
+
 ## v0.1 checks
 
 The deterministic local engine currently checks:
