@@ -1,6 +1,6 @@
 name: "DDC PR Proof"
 description: "Semantic proof-of-change for pull requests."
-author: "Altru.dev"
+author: "Valentyn Rukhaylo / Altru.dev"
 branding:
   icon: "shield"
   color: "purple"
