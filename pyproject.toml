@@ -8,9 +8,15 @@ version = "0.1.0"
 description = "Local-first semantic proof-of-change for pull requests"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Valentyn Rukhaylo / Altru.dev" }]
+authors = [{ name = "Valentyn Rukhaylo" }]
+maintainers = [{ name = "Valentyn Rukhaylo" }]
 license = { text = "All rights reserved" }
 keywords = ["github", "pull-request", "assurance", "semantic-diff", "ddc"]
+
+[project.urls]
+Homepage = "https://altru.dev"
+Repository = "https://github.com/altrudev/PR-Proof"
+Author = "https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/"
 
 [project.scripts]
 ddc-pr-proof = "pr_proof:main"
