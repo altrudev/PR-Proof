@@ -57,5 +57,30 @@ class ScoreTests(unittest.TestCase):
         self.assertTrue(any(f.category == "contradictions" for f in findings))
 
 
+    def test_render_quotes_evidence(self):
+        proof = pr_proof.Proof(
+            version="0.1.0",
+            base="main",
+            head="HEAD",
+            changed_files=1,
+            findings=[
+                pr_proof.Finding(
+                    "assumptions",
+                    "review",
+                    "Assumption changed",
+                    ["# cache must be available"],
+                )
+            ],
+            surprise_score=50,
+            intent_alignment=50,
+            overall_impact="MODERATE",
+            verdict="REVIEW",
+            proof_hash="abc",
+        )
+        rendered = pr_proof.render(proof)
+        self.assertIn("`# cache must be available`", rendered)
+        self.assertNotIn("\n  - # cache must be available", rendered)
+
+
 if __name__ == "__main__":
     unittest.main()
