@@ -34,6 +34,8 @@ FAIL = re.compile(r"\b(rollback|retry|retries|timeout|except|catch|recover|fallb
 INPUT = re.compile(r"\b(input|request|payload|param|argument|schema|validation|sanitize|parse)\b", re.I)
 ASSUME = re.compile(r"\b(assum|require|must|available|idempot|cache|database|network|reachable|exists|non.?null|guarantee)\b", re.I)
 PERM = re.compile(r"\bpermissions?\s*:|\bcontents\s*:|\bpull-requests\s*:|\bactions\s*:|\bpackages\s*:|\bid-token\s*:", re.I)
+DOC = re.compile(r"(^|/)(README|CHANGELOG|docs?)(\.|/|$)", re.I)
+FACT = re.compile(r"\b([A-Za-z][\w .-]{1,40})\s*(?:=|:|is|are)\s*(\d+(?:\.\d+)?)\b", re.I)
 
 @dataclass
 class Finding:
