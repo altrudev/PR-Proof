@@ -248,7 +248,7 @@ def render(p: Proof) -> str:
         for finding in grouped[key]:
             lines.append(("⚠ " if finding.severity == "review" else "✓ ") + finding.summary)
             for ev in finding.evidence[:4]:
-                lines.append("  - " + ev)
+                lines.append("  - `" + ev.replace("`", "'") + "`")
         lines.append("")
     lines += [
         "### DDC verdict",
