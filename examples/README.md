@@ -4,8 +4,8 @@ This directory exists only as a controlled validation fixture for DDC PR Proof.
 
 Declared guarantees:
 
-- retry count is 3
-- timeout is 5 seconds
+- retry count is 5
+- timeout is 10 seconds
 - rollback is enabled after terminal failure
 - callers must not assume idempotency
 
