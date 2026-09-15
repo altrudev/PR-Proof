@@ -114,6 +114,12 @@ Create .github/workflows/ddc-pr-proof.yml:
 
 The source diff stays inside the GitHub runner. v0.1 does not call an external model or external DDC service.
 
+### Forked pull requests
+
+On pull requests from forks, GitHub normally makes `GITHUB_TOKEN` read-only. PR-Proof still performs the local analysis and writes the GitHub Actions step summary, but GitHub may refuse the optional PR-comment update.
+
+PR-Proof deliberately does **not** recommend switching to `pull_request_target` merely to regain comment permissions, because that event carries a stronger trust boundary and can become unsafe when combined with untrusted pull-request contents. Keep the default `pull_request` workflow unless you have separately reviewed and hardened that boundary.
+
 ## Local CLI
 
 No external Python dependencies are required.
