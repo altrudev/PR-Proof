@@ -149,9 +149,12 @@ def cross_representation_contradictions(changed: list[str]) -> list[str]:
     """Find surviving declarations that disagree across tracked representations."""
     tracked = [x for x in git("ls-files").splitlines() if x.strip()]
     changed_set = set(changed)
+    candidates = changed_set | {p for p in tracked if DOC.search(p) or p.lower().endswith(".md")}
     by_key: dict[str, list[tuple[str, str]]] = {}
 
-    for path in tracked:
+    for path in sorted(candidates):
+        if path not in tracked:
+            continue
         if not (SRC.search(path) or CONFIG.search(path) or DOC.search(path) or path.lower().endswith(".md")):
             continue
         try:
@@ -180,7 +183,7 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
     source = [f for f in files if SRC.search(f) and not TEST.search(f)]
     tests = [f for f in files if TEST.search(f)]
     deps = [f for f in files if Path(f).name in DEP_FILES]
-    configs = [f for f in files if CONFIG.search(f)]
+    configs = [f for f in files if CONFIG.search(f) and Path(f).name not in DEP_FILES]
     docs = [f for f in files if DOC.search(f) or f.lower().endswith(".md")]
 
     if source:
@@ -221,13 +224,13 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
         flags["contradiction"] = True
         findings.append(Finding(
             "contradictions", "review",
-            "Surviving repository representations disagree",
+            "Changed representation conflicts with a surviving declaration",
             contradictions
         ))
 
     if tests:
         flags["tests"] = True
-        findings.append(Finding("tests", "info", str(len(tests)) + " test file(s) changed", tests[:5]))
+        findings.append(Finding("tests", "info", str(len(tests)) + " test file(s) changed; behavioral linkage not yet proven", tests[:5]))
     elif source:
         findings.append(Finding("tests", "review", "Implementation changed without a test-file change", source[:5]))
 
@@ -292,7 +295,7 @@ def render(p: Proof) -> str:
         ("contradictions","Contradictions"),
         ("dependencies","Dependency changes"),
         ("configuration","Configuration changes"),
-        ("tests","Test coverage")
+        ("tests","Test evidence")
     ]
     for key, heading in order:
         if key not in grouped:
