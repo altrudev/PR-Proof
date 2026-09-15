@@ -10,8 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Valentyn Rukhaylo" }]
 maintainers = [{ name = "Valentyn Rukhaylo" }]
-license = { text = "All rights reserved" }
+license = { file = "LICENSE" }
 keywords = ["github", "pull-request", "assurance", "semantic-diff", "ddc"]
+classifiers = ["License :: Other/Proprietary License"]
 
 [project.urls]
 Homepage = "https://altru.dev"
