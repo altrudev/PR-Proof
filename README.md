@@ -29,7 +29,7 @@ Example result:
     Failure-mode changes
     ⚠ retry / rollback behavior changed
 
-    Test coverage
+    Test evidence
     ⚠ implementation changed without a test-file change
 
     DDC verdict:
@@ -70,7 +70,7 @@ The deterministic local engine currently checks:
 1. Intent versus observed diff alignment
 2. Dependency changes
 3. Configuration and permission / authority changes
-4. Test-behavior changes
+4. Test-surface changes and missing-test evidence
 5. Failure, retry, recovery, and rollback changes
 6. Documentation / declared-guarantee contradictions
 
@@ -159,7 +159,7 @@ Near-term work is deliberately narrow:
 - per-finding confidence and provenance
 - stronger language-aware semantic diff adapters
 - config / permission adapters for common ecosystems
-- test-to-behavior linkage
+- test-to-behavior linkage (not yet claimed by v0.1)
 - contradiction graph across docs, config, and code
 - proof receipts tied to commit SHA and DDC version
 - optional signed attestations
