@@ -108,6 +108,69 @@ def hits(lines: list[str], rx: re.Pattern, limit: int = 4) -> list[str]:
                 break
     return out
 
+def extract_declarations(path: str, text: str) -> list[tuple[str, str]]:
+    """Extract a deliberately small set of comparable declarations."""
+    out: list[tuple[str, str]] = []
+    lower = text.lower()
+
+    patterns = (
+        ("retry_count", re.compile(r"\bretry[_ ]?count\s*(?:=|:|is)\s*(\d+)\b", re.I)),
+        ("timeout_seconds", re.compile(r"\btimeout(?:[_ ]seconds)?\s*(?:=|:|is)\s*(\d+)\b", re.I)),
+        ("rollback_enabled", re.compile(r"\brollback(?:[_ ]enabled)?\s*(?:=|:|is)?\s*(enabled|disabled|true|false)\b", re.I)),
+    )
+    for key, rx in patterns:
+        for value in rx.findall(text):
+            norm = str(value).lower()
+            if norm == "enabled":
+                norm = "true"
+            elif norm == "disabled":
+                norm = "false"
+            out.append((key, norm))
+
+    # Common code constants.
+    for value in re.findall(r"\bRETRY_COUNT\s*=\s*(\d+)\b", text):
+        out.append(("retry_count", value))
+    for value in re.findall(r"\bTIMEOUT_SECONDS\s*=\s*(\d+)\b", text):
+        out.append(("timeout_seconds", value))
+
+    # Nested retry YAML commonly uses short keys.
+    if re.search(r"(?m)^\s*retry\s*:\s*$", text):
+        for value in re.findall(r"(?m)^\s*count\s*:\s*(\d+)\s*$", text):
+            out.append(("retry_count", value))
+        for value in re.findall(r"(?m)^\s*timeout_seconds\s*:\s*(\d+)\s*$", text):
+            out.append(("timeout_seconds", value))
+        for value in re.findall(r"(?m)^\s*rollback_enabled\s*:\s*(true|false)\s*$", lower):
+            out.append(("rollback_enabled", value))
+
+    return list(dict.fromkeys(out))
+
+
+def cross_representation_contradictions(changed: list[str]) -> list[str]:
+    """Find surviving declarations that disagree across tracked representations."""
+    tracked = [x for x in git("ls-files").splitlines() if x.strip()]
+    changed_set = set(changed)
+    by_key: dict[str, list[tuple[str, str]]] = {}
+
+    for path in tracked:
+        if not (SRC.search(path) or CONFIG.search(path) or DOC.search(path) or path.lower().endswith(".md")):
+            continue
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for key, value in extract_declarations(path, text):
+            by_key.setdefault(key, []).append((path, value))
+
+    evidence: list[str] = []
+    for key, records in sorted(by_key.items()):
+        values = {value for _, value in records}
+        if len(values) < 2 or not any(path in changed_set for path, _ in records):
+            continue
+        rendered = " <> ".join(sorted({value + " @ " + path for path, value in records}))
+        evidence.append(key + ": " + rendered)
+    return evidence[:6]
+
+
 def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
     files = files_changed(base, head)
     added, removed = diff_lines(base, head)
@@ -153,23 +216,13 @@ def analyze_diff(base: str, head: str) -> tuple[list[Finding], dict[str, bool]]:
         flags["assumption"] = True
         findings.append(Finding("assumptions", "review", "New or modified operational assumptions detected", assumptions))
 
-    old_facts, new_facts = {}, {}
-    for line in removed:
-        for key, val in FACT.findall(line):
-            old_facts[re.sub(r"\\s+", " ", key.strip().lower())] = val
-    for line in added:
-        for key, val in FACT.findall(line):
-            new_facts[re.sub(r"\\s+", " ", key.strip().lower())] = val
-    contradictions = []
-    for key in sorted(old_facts.keys() & new_facts.keys()):
-        if old_facts[key] != new_facts[key]:
-            contradictions.append(key + ": " + old_facts[key] + " -> " + new_facts[key])
-    if contradictions and docs:
+    contradictions = cross_representation_contradictions(files)
+    if contradictions:
         flags["contradiction"] = True
         findings.append(Finding(
             "contradictions", "review",
-            "Documentation or declared guarantees changed inconsistently",
-            contradictions[:6]
+            "Surviving repository representations disagree",
+            contradictions
         ))
 
     if tests:
@@ -319,7 +372,9 @@ def command_analyze(args) -> int:
     findings, flags = analyze_diff(base, head)
     surprise, alignment = scores(title, body, flags)
     impact, verdict = posture(findings, surprise, alignment)
-    proof = Proof(VERSION, base, head, len(files_changed(base, head)), findings, surprise, alignment, impact, verdict)
+    base_sha = git("rev-parse", base).strip()
+    head_sha = git("rev-parse", head).strip()
+    proof = Proof(VERSION, base_sha, head_sha, len(files_changed(base, head)), findings, surprise, alignment, impact, verdict)
     canonical = json.dumps({**asdict(proof), "proof_hash": ""}, sort_keys=True, separators=(",", ":"))
     proof.proof_hash = hashlib.sha256(canonical.encode()).hexdigest()
     out = args.output or ".ddc/pr-proof.json"
