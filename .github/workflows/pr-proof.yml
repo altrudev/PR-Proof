@@ -16,8 +16,17 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: altrudev/PR-Proof@main
+      - id: proof
+        uses: altrudev/PR-Proof@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           post-comment: "true"
           fail-on: "never"
+
+      - name: Validate proof outputs
+        shell: bash
+        run: |
+          test -n "${{ steps.proof.outputs.verdict }}"
+          test -n "${{ steps.proof.outputs.surprise-score }}"
+          test -n "${{ steps.proof.outputs.intent-alignment }}"
+          test -f "${{ steps.proof.outputs.proof-file }}"
