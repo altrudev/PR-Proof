@@ -99,5 +99,18 @@ class ScoreTests(unittest.TestCase):
         self.assertNotIn("\n  - # cache must be available", rendered)
 
 
+    def test_spoofed_marker_comment_is_not_owned(self):
+        spoofed = {
+            "body": pr_proof.MARKER + "\nforged",
+            "user": {"login": "attacker", "type": "User"},
+        }
+        owned = {
+            "body": pr_proof.MARKER + "\nreal",
+            "user": {"login": "github-actions[bot]", "type": "Bot"},
+        }
+        self.assertFalse(pr_proof.is_own_proof_comment(spoofed))
+        self.assertTrue(pr_proof.is_own_proof_comment(owned))
+
+
 if __name__ == "__main__":
     unittest.main()
