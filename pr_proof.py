@@ -341,6 +341,15 @@ def api(method: str, url: str, token: str, payload: dict | None = None):
         raw = resp.read()
         return json.loads(raw) if raw else None
 
+def is_own_proof_comment(comment: dict) -> bool:
+    user = comment.get("user") or {}
+    return (
+        MARKER in comment.get("body", "")
+        and user.get("login") == "github-actions[bot]"
+        and user.get("type") in (None, "Bot")
+    )
+
+
 def upsert_comment(markdown: str, repo: str | None, number: int | None) -> None:
     token = os.getenv("DDC_GITHUB_TOKEN") or os.getenv("GITHUB_TOKEN")
     if not token or not repo or not number or os.getenv("DDC_POST_COMMENT", "true").lower() != "true":
@@ -348,7 +357,7 @@ def upsert_comment(markdown: str, repo: str | None, number: int | None) -> None:
     url = "https://api.github.com/repos/" + repo + "/issues/" + str(number) + "/comments"
     try:
         comments = api("GET", url, token)
-        existing = next((c for c in comments if MARKER in c.get("body", "")), None)
+        existing = next((c for c in comments if is_own_proof_comment(c)), None)
         if existing:
             api("PATCH", "https://api.github.com/repos/" + repo + "/issues/comments/" + str(existing["id"]), token, {"body": markdown})
         else:
