@@ -45,16 +45,33 @@ class ScoreTests(unittest.TestCase):
         self.assertEqual(verdict, "BLOCK")
 
 
-    def test_contradiction_path_executes(self):
-        with mock.patch.object(pr_proof, "files_changed", return_value=["docs/README.md"]), \
+    def test_cross_representation_contradiction_requires_surviving_disagreement(self):
+        with mock.patch.object(pr_proof, "files_changed", return_value=["config/retry.yaml"]), \
+             mock.patch.object(pr_proof, "diff_lines", return_value=([], [])), \
              mock.patch.object(
                  pr_proof,
-                 "diff_lines",
-                 return_value=(["retry count is 5"], ["retry count is 3"]),
+                 "cross_representation_contradictions",
+                 return_value=["rollback_enabled: false @ config/retry.yaml <> true @ README.md"],
              ):
             findings, flags = pr_proof.analyze_diff("base", "head")
         self.assertTrue(flags["contradiction"])
         self.assertTrue(any(f.category == "contradictions" for f in findings))
+
+    def test_declaration_change_alone_is_not_a_contradiction(self):
+        with mock.patch.object(pr_proof, "files_changed", return_value=["config/retry.yaml"]), \
+             mock.patch.object(pr_proof, "diff_lines", return_value=(["count: 5"], ["count: 3"])), \
+             mock.patch.object(pr_proof, "cross_representation_contradictions", return_value=[]):
+            findings, flags = pr_proof.analyze_diff("base", "head")
+        self.assertFalse(flags["contradiction"])
+        self.assertFalse(any(f.category == "contradictions" for f in findings))
+
+    def test_extracts_retry_declarations_across_representations(self):
+        doc = "- retry count is 5\n- timeout is 10 seconds\n- rollback is enabled\n"
+        cfg = "retry:\n  count: 5\n  timeout_seconds: 10\n  rollback_enabled: false\n"
+        self.assertIn(("retry_count", "5"), pr_proof.extract_declarations("README.md", doc))
+        self.assertIn(("timeout_seconds", "10"), pr_proof.extract_declarations("README.md", doc))
+        self.assertIn(("rollback_enabled", "true"), pr_proof.extract_declarations("README.md", doc))
+        self.assertIn(("rollback_enabled", "false"), pr_proof.extract_declarations("config.yaml", cfg))
 
 
     def test_render_quotes_evidence(self):
