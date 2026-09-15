@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
   issues: write
 
 jobs:
@@ -17,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: ./
+      - uses: altrudev/PR-Proof@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           post-comment: "true"
