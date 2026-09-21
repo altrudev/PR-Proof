@@ -177,6 +177,7 @@ Near-term work is deliberately narrow:
 
 - Author / creator: [Valentyn Rukhaylo](https://www.linkedin.com/in/val-rukhaylo-437a1b3b6/)
 - Project / publisher: [Altru.dev](https://altru.dev)
+- Assurance relationship: [DDC Assurance Lab](https://altru.dev/ddc-assurance-lab) · [ddcal.ca](https://ddcal.ca/)
 - GitHub: [altrudev](https://github.com/altrudev)
 - Repository: [altrudev/PR-Proof](https://github.com/altrudev/PR-Proof)
 
@@ -186,7 +187,7 @@ If you reference, evaluate, demonstrate, or discuss this work publicly, please a
 
 > **DDC PR Proof — created by Valentyn Rukhaylo / Altru.dev**
 
-See [NOTICE](NOTICE), [AUTHORS.md](AUTHORS.md), [CITATION.cff](CITATION.cff), and [LICENSE](LICENSE) for formal attribution and usage terms.
+See [PROVENANCE.md](PROVENANCE.md), [NOTICE](NOTICE), [AUTHORS.md](AUTHORS.md), [CITATION.cff](CITATION.cff), and [LICENSE](LICENSE) for formal provenance, attribution, and usage terms.
 
 ## Status
 
